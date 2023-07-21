@@ -16,4 +16,12 @@ body,
 
 main {
   flex: 1;
+  background-color: #363636;
+}
+
+.container {
+  background-color: #FFF;
+  border-radius: 5px;
+  margin: 15px 0;
+  padding: 30px;
 }

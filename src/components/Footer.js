@@ -5,9 +5,9 @@ import Typography from '@mui/material/Typography';
 
 const Footer = () => {
     return (
-        <Box sx={{ bgcolor: 'background.paper', p: 3 }}>
+        <Box sx={{ bgcolor: 'black', p: 3 }}>
             <Container maxWidth="sm">
-                <Typography variant="body1" align="center">
+                <Typography variant="body1" color="white" align="center">
                     &copy; {new Date().getFullYear()} PAXCREATION
                 </Typography>
             </Container>
