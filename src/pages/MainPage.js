@@ -11,6 +11,7 @@ import { styled } from '@mui/system';
 import { db } from '../config/firebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
+import { Link } from 'react-router-dom';
 
 const StyledCard = styled(Card)(({ theme }) => ({
     height: '100%',
@@ -75,42 +76,58 @@ const MainPage = () => {
     const filteredEmployees = filter === 'All' ? employees : employees.filter(employee => employee.position === filter);
 
     return (
-        <Container className="container" maxWidth="lg">
-            <Grid container spacing={4}>
-                <Grid item xs={12} sm={3}>
-                    <Box display="flex" flexDirection="column">
-                        <StyledButton onClick={() => setFilter('All')}>All</StyledButton>
-                        <StyledButton onClick={() => setFilter('Software Engineer')}>Software Engineer 🟢</StyledButton>
-                        <StyledButton onClick={() => setFilter('UX/UI Designer')}>UX/UI Designer 🔵</StyledButton>
-                        <StyledButton onClick={() => setFilter('Project Director')}>Project Director 🟠</StyledButton>
-                    </Box>
-                </Grid>
-                <Grid item xs={12} sm={9}>
-                    <Grid container spacing={4}>
-                        {filteredEmployees.map((employee) => (
-                            <Grid item key={employee.id} xs={12} sm={6} md={4}>
-                                <StyledCard>
-                                    <CardMedia
-                                        component="img"
-                                        image={employee.img_path}
-                                        height='auto'
-                                        alt={employee.user_name}
-                                    />
-                                    <StyledCardContent style={{ backgroundColor: '#363636', fontWeight: 'bold', }}>
-                                        <Typography gutterBottom variant="h5" component="div" style={{ color: '#fff', fontWeight: 'bold', }}>
-                                            {employee.user_name}
-                                        </Typography>
-                                        <Typography variant="body2" style={{ color: '#bdbdbd', fontWeight: 'bold', }}>
-                                            {employee.position}
-                                        </Typography>
-                                    </StyledCardContent>
-                                </StyledCard>
-                            </Grid>
-                        ))}
+        <>
+            <Typography variant="h1" style={{
+                fontFamily: 'acumin-pro, "Noto Sans JP", sans-serif',
+                fontWeight: 700,
+                fontSize: 144,
+                lineHeight: '144px',
+                color: '#fff',
+                textAlign: 'start',
+                margin: '40px 0',
+                // marginBottom: '40px',
+            }}>
+                Members
+            </Typography>
+            <Container className="container" maxWidth="lg">
+                <Grid container spacing={4}>
+                    <Grid item xs={12} sm={3}>
+                        <Box display="flex" flexDirection="column">
+                            <StyledButton onClick={() => setFilter('All')}>All</StyledButton>
+                            <StyledButton onClick={() => setFilter('Software Engineer')}>Software Engineer 🟢</StyledButton>
+                            <StyledButton onClick={() => setFilter('UX/UI Designer')}>UX/UI Designer 🔵</StyledButton>
+                            <StyledButton onClick={() => setFilter('Project Director')}>Project Director 🟠</StyledButton>
+                        </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={9}>
+                        <Grid container spacing={4}>
+                            {filteredEmployees.map((employee) => (
+                                <Grid item key={employee.id} xs={12} sm={6} md={4}>
+                                    <Link to={`/user/${employee.id}`}>
+                                        <StyledCard>
+                                            <CardMedia
+                                                component="img"
+                                                image={employee.img_path}
+                                                height='auto'
+                                                alt={employee.user_name}
+                                            />
+                                            <StyledCardContent style={{ backgroundColor: '#363636', fontWeight: 'bold', }}>
+                                                <Typography gutterBottom variant="h5" component="div" style={{ color: '#fff', fontWeight: 'bold', }}>
+                                                    {employee.user_name}
+                                                </Typography>
+                                                <Typography variant="body2" style={{ color: '#bdbdbd', fontWeight: 'bold', }}>
+                                                    {employee.position}
+                                                </Typography>
+                                            </StyledCardContent>
+                                        </StyledCard>
+                                    </Link>
+                                </Grid>
+                            ))}
+                        </Grid>
                     </Grid>
                 </Grid>
-            </Grid>
-        </Container>
+            </Container>
+        </>
     );
 };
 
