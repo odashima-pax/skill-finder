@@ -1,64 +1,114 @@
-import React from "react";
+import { React, useState, useEffect } from "react";
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
 import { styled } from '@mui/system';
-import { indigo } from '@mui/material/colors';
+import { db } from '../config/firebaseConfig';
+import { collection, getDocs } from 'firebase/firestore';
+import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 
 const StyledCard = styled(Card)(({ theme }) => ({
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
-    boxShadow: '1px 6px 7px rgba(0, 0, 0, 0.1)', // 影を追加
-    borderBottom: `4px solid ${indigo[300]}`, // 最下部にボーダーの色を追加
+    borderRadius: '10px',
+    transition: 'transform 0.3s',
+    '&:hover': {
+        transform: 'scale(1.05)'
+    },
+    cursor: 'pointer',
 }));
 
 const StyledCardContent = styled(CardContent)(({ theme }) => ({
     flexGrow: 1,
 }));
 
-
-
-const employees = [
-    // サンプルデータ
-    { id: 1, name: 'yuu', position: 'developer', image: 'https://source.unsplash.com/random?sig=1' },
-    { id: 2, name: 'go', position: 'manager', image: 'https://source.unsplash.com/random?sig=2' },
-    { id: 3, name: 'el', position: 'designer', image: 'https://source.unsplash.com/random?sig=3' },
-    { id: 4, name: 'eiwlc', position: 'designer', image: 'https://source.unsplash.com/random?sig=4' },
-    { id: 5, name: 'yuu', position: 'developer', image: 'https://source.unsplash.com/random?sig=1' },
-    { id: 6, name: 'go', position: 'manager', image: 'https://source.unsplash.com/random?sig=2' },
-    { id: 7, name: 'el', position: 'designer', image: 'https://source.unsplash.com/random?sig=3' },
-    { id: 8, name: 'eiwlc', position: 'designer', image: 'https://source.unsplash.com/random?sig=4' },
-]
+const StyledButton = styled(Button)({
+    fontFamily: 'acumin-pro, "Noto Sans JP", sans-serif',
+    textAlign: 'left',
+    color: '#fff',
+    fontSize: 'large',
+    fontWeight: 'bold',
+    transition: 'transform 0.3s',
+    textTransform: 'none',
+    position: 'sticky',
+    top: 0,
+    '&:hover': {
+        transform: 'scale(1.07)',
+    },
+    margin: '3px 0',
+    justifyContent: 'flex-start',
+});
 
 
 const MainPage = () => {
+    const [employees, setEmployees] = useState([]);
+    const [filter, setFilter] = useState('All')
+
+    useEffect(() => {
+        const fetchEmployees = async () => {
+
+            const storage = getStorage();
+            const data = await getDocs(collection(db, 'users'));
+            const employeesList = await Promise.all(data.docs.map(async doc => {
+                const employee = doc.data();
+                const imageRef = ref(storage, employee.img_path);
+                const url = await getDownloadURL(imageRef);
+
+                return {
+                    ...employee,
+                    id: doc.id,
+                    img_path: url,
+                }
+            }))
+            setEmployees(employeesList);
+        };
+
+        fetchEmployees();
+    }, []);
+
+    const filteredEmployees = filter === 'All' ? employees : employees.filter(employee => employee.position === filter);
+
     return (
-        <Container className="container" maxWidth="md">
+        <Container className="container" maxWidth="lg">
             <Grid container spacing={4}>
-                {employees.map((employee) => (
-                    <Grid item key={employee.id} xs={12} sm={6} md={4}>
-                        <StyledCard>
-                            <CardMedia
-                                component="img"
-                                height="140"
-                                image={employee.image}
-                                alt={employee.name}
-                            />
-                            <StyledCardContent>
-                                <Typography gutterBottom variant="h5" component="div">
-                                    {employee.name}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {employee.position}
-                                </Typography>
-                            </StyledCardContent>
-                        </StyledCard>
+                <Grid item xs={12} sm={3}>
+                    <Box display="flex" flexDirection="column">
+                        <StyledButton onClick={() => setFilter('All')}>All</StyledButton>
+                        <StyledButton onClick={() => setFilter('Software Engineer')}>Software Engineer 🟢</StyledButton>
+                        <StyledButton onClick={() => setFilter('UX/UI Designer')}>UX/UI Designer 🔵</StyledButton>
+                        <StyledButton onClick={() => setFilter('Project Director')}>Project Director 🟠</StyledButton>
+                    </Box>
+                </Grid>
+                <Grid item xs={12} sm={9}>
+                    <Grid container spacing={4}>
+                        {filteredEmployees.map((employee) => (
+                            <Grid item key={employee.id} xs={12} sm={6} md={4}>
+                                <StyledCard>
+                                    <CardMedia
+                                        component="img"
+                                        image={employee.img_path}
+                                        height='auto'
+                                        alt={employee.user_name}
+                                    />
+                                    <StyledCardContent style={{ backgroundColor: '#363636', fontWeight: 'bold', }}>
+                                        <Typography gutterBottom variant="h5" component="div" style={{ color: '#fff', fontWeight: 'bold', }}>
+                                            {employee.user_name}
+                                        </Typography>
+                                        <Typography variant="body2" style={{ color: '#bdbdbd', fontWeight: 'bold', }}>
+                                            {employee.position}
+                                        </Typography>
+                                    </StyledCardContent>
+                                </StyledCard>
+                            </Grid>
+                        ))}
                     </Grid>
-                ))}
+                </Grid>
             </Grid>
         </Container>
     );

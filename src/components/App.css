@@ -7,6 +7,10 @@ body,
 #root,
 .app {
   height: 100%;
+  font-family: acumin-pro, "Noto Sans JP", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #363636;
 }
 
 .app {
@@ -20,8 +24,8 @@ main {
 }
 
 .container {
-  background-color: #FFF;
+  background-color: #363636;
   border-radius: 5px;
   margin: 15px 0;
-  padding: 30px;
+  padding: 15px;
 }
